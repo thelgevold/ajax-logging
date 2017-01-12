@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <script src="/node_modules/log4javascript/js/log4javascript.js"></script> 
+    <script>
+      class LoggerFactory {
+        constructor() {
+          let rootLogger = log4javascript.getRootLogger();
+          
+          // logs to remote log via ajax call
+          var ajaxAppender = new log4javascript.AjaxAppender("/logging");
+          ajaxAppender.setThreshold(log4javascript.Level.ERROR);
+          rootLogger.addAppender(ajaxAppender);
+
+          // logs to console
+          let consoleAppender = new log4javascript.BrowserConsoleAppender();
+          consoleAppender.setThreshold(log4javascript.Level.DEBUG);
+          consoleAppender.setLayout(new log4javascript.PatternLayout('%d{HH:mm:ss} %-5p - %c% - %m{3}%'));
+          rootLogger.addAppender(consoleAppender);
+        }
+
+        getLogger(name) {
+          return log4javascript.getLogger(name);
+        }
+      }   
+
+      var loggerFactory = new LoggerFactory();
+    </script>
+  </head>    
+
+  <body>
+    <button id="btnFatal">Log Fatal</button>
+    <button id="btnError">Log Error</button>
+    <button id="btnDebug">Log Debug</button>
+
+     <script>
+       document.querySelector('#btnError').addEventListener('click', () => {
+         let logger = loggerFactory.getLogger('my.fatal.error.logger');
+         logger.error('There was a fatal error');    
+      });
+
+      document.querySelector('#btnFatal').addEventListener('click', () => {
+         let logger = loggerFactory.getLogger('my.error.logger');
+
+         logger.fatal('There was an error');    
+      });
+
+      document.querySelector('#btnDebug').addEventListener('click', () => {
+         let logger = loggerFactory.getLogger('my.trace.logger');
+
+         logger.debug('Just debugging');    
+      });
+
+    </script>         
+  </body>
+</html>
